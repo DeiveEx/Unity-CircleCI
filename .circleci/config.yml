@@ -1,5 +1,8 @@
+# For a reference of all available configutations keys, check: https://circleci.com/docs/configuration-reference/
+
 # The CircleCI version to use
 version: 2.1
+
 
 # Orbs to use. You can think of them as "libraries" that you can import and use pre-defined commands/jobs.
 # You can search for orbs here: https://circleci.com/developer/orbs
@@ -7,14 +10,32 @@ orbs:
   # The "key" of the orb can be anything
   win: circleci/windows@5.0.0
 
+
+# We can define parameters to use as variables in our config. Check this link for more details: https://circleci.com/docs/reusing-config/#using-the-parameters-declaration
+parameters:
+  # Here we are defining a paramenter called "test-valu"
+  test-value:
+    # We need to say which type it is. Check this link for a lit of valid types
+    type: integer
+    # We can also define a default type
+    default: 10
+
+
 # Commands are a collection of "steps" that can be reused
 commands:
-  # Here we are defining a commands called "bye-world"
-  bye-world:
-    # And here we are defining the actual steps the commands executes
+  # Here we are defining a command called "bye-world"
+  print-test-values:
+    # Commands can also have parameters
+    parameters:
+      # If we DON'T define a default value, this parameter is treated as required
+      test-value:
+        type: string
+    # And here we are defining the actual steps the command executes
     steps:
-      # The "run" commands executes a cli command. Sicne we're using a Windows Orb, we can use the Windows cli commands
-      - run: Write-Host "Bye world!"
+      # The "run" command executes a cli command. Since we're using a Windows Orb, we can use the Windows cli commands.
+      # Here we're also using some parameters. Not the use of "pipeline" in one of them
+      - run: echo "Pipeline parameter is << pipeline.parameters.test-value >>"
+      - run: echo "Command paramter is << parameters.test-value >>"
 
 
 # Jobs are a collection of "steps" that runs commands or scripts.
@@ -29,12 +50,24 @@ jobs:
       # We have optional arguments as well. Here we are defining the resource class, which is basically how many resources is available
       # to execute this command. Available sizes can be checked in the pricing plans of CircleCI
       size: "medium"
+    # We can also have parameters inside a job
+    parameters:
+      test-value:
+        type: string
     # Finally, we need to defined the actual steps the job will execute. Steps can be commands or scripts
     steps:
-      # The "checkout" command is a built-in command from CircleCI, which will just pull all changes from teh repository
+      # The "checkout" command is a built-in command from CircleCI, which will just pull all changes from the repository
       - checkout
-      - run: Write-Host "Hello World!"
-      - bye-world
+      - run: echo "Hello World!"
+      # And, of course, we can call our own previously defined commands
+      - print-test-values:
+        test-value: test-value
+  post-build:
+    executor:
+      name: win/default
+    steps:
+      - run: echo "Build has finished"
+
 
 # Workflows defines a list of jobs and their execution order.
 workflows:
@@ -43,4 +76,15 @@ workflows:
     # Inside the workflow, we then define which jobs it'll execute. In this case we're using the "build" job we defined before, 
     # but we can defined the job body here if we want.
     jobs:
-      - build
+      - build:
+        test-value: "test string"
+        # We can define filters to tell when a job should be executed.
+        # In this case, we're saying this job will be executed only when the main branch changes
+        filters:
+          branches:
+            only:
+              - main
+      # Jobs are executed in parallel by default, so if we can tell a job that it needs to wait for another job before executing
+      - post-build:
+        requires:
+          - build
