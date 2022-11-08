@@ -63,18 +63,16 @@ jobs:
         steps:
             # The "checkout" command is a built-in command from CircleCI, which will just pull all changes from the repository
             - checkout
-            - run: echo "Hello World!"
+            #- run: echo "Hello World!"
             # And, of course, we can call our own previously defined commands
-            - print-test-values:
-                test-value-command: << parameters.test-value-job >>
+            #- print-test-values:
+            #    test-value-command: << parameters.test-value-job >>
+            - run: echo ${TEST_VAR}
             - run:
                 # We can also give custom name to things like steps, commands, and jobs
                 name: "Print environment variables"
                 # We can use environment variables as well, although these only exists at the job level
-                command: |
-                    $VERSION="${CIRCLE_BRANCH}.${CIRCLE_BUILD_NUM}"
-                    echo $VERSION
-                
+                command: echo "This job was executed by $CIRCLE_USERNAME, from repo $CIRCLE_PROJECT_REPONAME, branch $CIRCLE_BRANCH. Also ${PROJECT_ENV_VAR}"
     post-build:
         description: "This is the second job"
         executor:
