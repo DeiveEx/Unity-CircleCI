@@ -1,0 +1,46 @@
+# The CircleCI version to use
+version: 2.1
+
+# Orbs to use. You can think of them as "libraries" that you can import and use pre-defined commands/jobs.
+# You can search for orbs here: https://circleci.com/developer/orbs
+orbs:
+  # The "key" of the orb can be anything
+  win: circleci/windows@5.0.0
+
+# Commands are a collection of "steps" that can be reused
+commands:
+  # Here we are defining a commands called "bye-world"
+  bye-world:
+    # And here we are defining the actual steps the commands executes
+    steps:
+      # The "run" commands executes a cli command. Sicne we're using a Windows Orb, we can use the Windows cli commands
+      - run: Write-Host "Bye world!"
+
+
+# Jobs are a collection of "steps" that runs commands or scripts.
+jobs:
+  # Here we are creating a job called "build"
+  build:
+    # Each job requires an "executor", which is "who" is gonna execute the steps defined.
+    # In this case, we're using the windows orb defined above.
+    executor:
+      # Check the orb documentation to see which executors are available
+      name: win/default
+      # We have optional arguments as well. Here we are defining the resource class, which is basically how many resources is available
+      # to execute this command. Available sizes can be checked in the pricing plans of CircleCI
+      size: "medium"
+    # Finally, we need to defined the actual steps the job will execute. Steps can be commands or scripts
+    steps:
+      # The "checkout" command is a built-in command from CircleCI, which will just pull all changes from teh repository
+      - checkout
+      - run: Write-Host "Hello World!"
+      - bye-world
+
+# Workflows defines a list of jobs and their execution order.
+workflows:
+  # Here we're creating a workflow called "hello-world"
+  hello-world:
+    # Inside the workflow, we then define which jobs it'll execute. In this case we're using the "build" job we defined before, 
+    # but we can defined the job body here if we want.
+    jobs:
+      - build
