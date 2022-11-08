@@ -57,7 +57,7 @@ jobs:
             - run: echo "Hello World!"
             # And, of course, we can call our own previously defined commands
             - print-test-values:
-              test-value-command: test-value-job
+                test-value-command: << parameters.test-value-job >>
     post-build:
         executor:
             name: win/default
@@ -72,14 +72,14 @@ workflows:
         # but we can defined the job body here if we want.
         jobs:
             - build:
-              test-value-job: "test string"
-              # We can define filters to tell when a job should be executed.
-              # In this case, we're saying this job will be executed only when the main branch changes
-              filters:
-                  branches:
-                      only:
-                          - main
+                test-value-job: "test string"
+                # We can define filters to tell when a job should be executed.
+                # In this case, we're saying this job will be executed only when the main branch changes
+                filters:
+                    branches:
+                        only:
+                            - main
             # Jobs are executed in parallel by default, so if we can tell a job that it needs to wait for another job before executing
             - post-build:
-              requires:
-                  - build
+                requires:
+                    - build
