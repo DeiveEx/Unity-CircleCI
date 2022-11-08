@@ -1,13 +1,16 @@
+# For a full documentation, check: https://circleci.com/docs/
 # For a reference of all available configutations keys, check: https://circleci.com/docs/configuration-reference/
 
 # The CircleCI version to use
 version: 2.1
+
 
 # Orbs to use. You can think of them as "libraries" that you can import and use pre-defined commands/jobs.
 # You can search for orbs here: https://circleci.com/developer/orbs
 orbs:
     # The "key" of the orb can be anything
     win: circleci/windows@5.0.0
+
 
 # We can define parameters to use as variables in our config. Check this link for more details: https://circleci.com/docs/reusing-config/#using-the-parameters-declaration
 parameters:
@@ -17,11 +20,15 @@ parameters:
         type: integer
         # We can also define a default type
         default: 10
+        #we can also add a description to most elements, which CircleCI uses to generate documentation
+        description: "A test value for testing purposes"
+
 
 # Commands are a collection of "steps" that can be reused
 commands:
     # Here we are defining a command called "bye-world"
     print-test-values:
+        description: "Prints the test values into the console"
         # Commands can also have parameters
         parameters:
             # If we DON'T define a default value, this parameter is treated as required
@@ -32,12 +39,16 @@ commands:
             # The "run" command executes a cli command. Since we're using a Windows Orb, we can use the Windows cli commands.
             # Here we're also using some parameters. Not the use of "pipeline" in one of them
             - run: echo "Pipeline parameter is << pipeline.parameters.test-value >>"
-            - run: echo "Command paramter is << parameters.test-value-command >>"
+            - run: echo "Command parameter is << parameters.test-value-command >>"
+            #We can use environment variables as well
+            - run: echo "This job was executed by $CIRCLE_USERNAME, from repo '$CIRCLE_PROJECT_REPONAME', branch '$CIRCLE_BRANCH'"
+
 
 # Jobs are a collection of "steps" that runs commands or scripts.
 jobs:
     # Here we are creating a job called "build"
     build:
+        description: "This is the first job"
         # Each job requires an "executor", which is "who" is gonna execute the steps defined.
         # In this case, we're using the windows orb defined above.
         executor:
@@ -59,10 +70,12 @@ jobs:
             - print-test-values:
                 test-value-command: << parameters.test-value-job >>
     post-build:
+        description: "This is the second job"
         executor:
             name: win/default
         steps:
             - run: echo "Build has finished"
+
 
 # Workflows defines a list of jobs and their execution order.
 workflows:
