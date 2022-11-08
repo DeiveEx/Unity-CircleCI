@@ -72,6 +72,7 @@ jobs:
                 name: "Print environment variables"
                 # We can use environment variables as well, although these only exists at the job level
                 command: echo "This job was executed by $CIRCLE_USERNAME, from repo $CIRCLE_PROJECT_REPONAME, branch $CIRCLE_BRANCH"
+            - run: echo $CIRCLE_BRANCH
     post-build:
         description: "This is the second job"
         executor:
