@@ -4,11 +4,13 @@
 # The CircleCI version to use
 version: 2.1
 
+
 # Orbs to use. You can think of them as "libraries" that you can import and use pre-defined commands/jobs.
 # You can search for orbs here: https://circleci.com/developer/orbs
 orbs:
     # The "key" of the orb can be anything
     win: circleci/windows@5.0.0
+
 
 # We can define parameters to use as variables in our config. Check this link for more details: https://circleci.com/docs/reusing-config/#using-the-parameters-declaration
 parameters:
@@ -20,6 +22,7 @@ parameters:
         default: 10
         #we can also add a description to most elements, which CircleCI uses to generate documentation
         description: "A test value for testing purposes"
+
 
 # Commands are a collection of "steps" that can be reused
 commands:
@@ -37,6 +40,7 @@ commands:
             # Here we're also using some parameters. Not the use of "pipeline" in one of them
             - run: echo "Pipeline parameter is << pipeline.parameters.test-value >>"
             - run: echo "Command parameter is << parameters.test-value-command >>"
+
 
 # Jobs are a collection of "steps" that runs commands or scripts.
 jobs:
@@ -62,31 +66,22 @@ jobs:
             - run: echo "Hello World!"
             # And, of course, we can call our own previously defined commands
             - print-test-values:
-                  test-value-command: << parameters.test-value-job >>
+                test-value-command: << parameters.test-value-job >>
             - run:
-                  # We can also give custom name to things like steps, commands, and jobs
-                  name: "Print environment variables"
-                  # We can use environment variables as well, although these only exists at the job level
-                  command: echo "This job was executed by $CIRCLE_USERNAME, from repo $CIRCLE_PROJECT_REPONAME, branch $CIRCLE_BRANCH"
+                # We can also give custom name to things like steps, commands, and jobs
+                name: "Print environment variables"
+                # We can use environment variables as well, although these only exists at the job level
+                command: |
+                    readonly VERSION="${CIRCLE_BRANCH}.${CIRCLE_BUILD_NUM}"
+                    echo $VERSION
+                
     post-build:
         description: "This is the second job"
         executor:
             name: win/default
         steps:
             - run: echo "Build has finished"
-    test:
-        executor:
-            name: win/default
-        steps: # steps that comprise the `build` job
-            - checkout # check out source code to working directory
-            - run: # print the name of the branch we're on
-                  name: "What branch am I on?"
-                  command: echo ${CIRCLE_BRANCH}
-            # Run another step, the same as above; note that you can
-            # invoke environment variable without curly braces.
-            - run:
-                  name: "What branch am I on now?"
-                  command: echo $CIRCLE_BRANCH
+
 
 # Workflows defines a list of jobs and their execution order.
 workflows:
@@ -96,15 +91,14 @@ workflows:
         # but we can defined the job body here if we want.
         jobs:
             - build:
-                  test-value-job: "test string"
-                  # We can define filters to tell when a job should be executed.
-                  # In this case, we're saying this job will be executed only when the main branch changes
-                  filters:
-                      branches:
-                          only:
-                              - main
+                test-value-job: "test string"
+                # We can define filters to tell when a job should be executed.
+                # In this case, we're saying this job will be executed only when the main branch changes
+                filters:
+                    branches:
+                        only:
+                            - main
             # Jobs are executed in parallel by default, so if we can tell a job that it needs to wait for another job before executing
             - post-build:
-                  requires:
-                      - build
-            - test
+                requires:
+                    - build
