@@ -75,6 +75,8 @@ jobs:
         steps:
             - run: echo "Build has finished"
     test:
+        executor:
+            name: win/default
         steps: # steps that comprise the `build` job
             - checkout # check out source code to working directory
             - run: # print the name of the branch we're on
