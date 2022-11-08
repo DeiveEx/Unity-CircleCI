@@ -72,7 +72,7 @@ jobs:
                 name: "Print environment variables"
                 # We can use environment variables as well, although these only exists at the job level
                 command: |
-                    readonly VERSION="${CIRCLE_BRANCH}.${CIRCLE_BUILD_NUM}"
+                    $VERSION="${CIRCLE_BRANCH}.${CIRCLE_BUILD_NUM}"
                     echo $VERSION
                 
     post-build:
