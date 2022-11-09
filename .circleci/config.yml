@@ -8,29 +8,30 @@ parameters:
         description: "The unity version to use"
         type: string
         default: "2021.3.13f1"
+    build-name:
+        description: "The name of the build"
+        type: string
+        default: "Build"
 
 workflows:
-    create-unity-activation-file:
-        jobs:
-            - unity/create-activation-file:
-                editor_version: << pipeline.parameters.editor-version >>
     build:
         jobs:
             # Windows Build
             - unity/build:
                 filters:
                   branches:
-                    ignore:
+                    only:
                         - main
                 executor:
                     name: "unity/windows-2019"
                     target_platform: "windows-il2cpp"
                     editor_version: << pipeline.parameters.editor-version >>
-                name: "Build-windowsx64-il2cpp"
+                name: "<< pipeline.parameters.build-name >>-windowsx64-il2cpp"
                 build-name: ""
                 project-path: .
                 build-target: StandaloneWindows64
                 compress: true
                 custom-parameters: ""
                 store-artifacts: true
+                context: unity-personal
     
