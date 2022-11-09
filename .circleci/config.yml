@@ -1,105 +1,21 @@
-# For a full documentation, check: https://circleci.com/docs/
-# For a reference of all available configutations keys, check: https://circleci.com/docs/configuration-reference/
-
-# The CircleCI version to use
 version: 2.1
 
-
-# Orbs to use. You can think of them as "libraries" that you can import and use pre-defined commands/jobs.
-# You can search for orbs here: https://circleci.com/developer/orbs
 orbs:
-    # The "key" of the orb can be anything
-    win: circleci/windows@5.0.0
+    unity: game-ci/unity@1.3.0
 
-
-# We can define parameters to use as variables in our config. Check this link for more details: https://circleci.com/docs/reusing-config/#using-the-parameters-declaration
-parameters:
-    # Here we are defining a paramenter called "test-value"
-    test-value:
-        # We need to say which type it is.
-        type: integer
-        # We can also define a default value
-        default: 10
-        # And we can also add a description to most elements, which CircleCI uses to generate documentation
-        description: "A test value for testing purposes"
-
-
-# Commands are a collection of "steps" that can be reused
-commands:
-    # Here we are defining a command called "print-test-values"
-    print-test-values:
-        description: "Prints the test values into the console"
-        # Commands can also have parameters
-        parameters:
-            # If we DON'T define a default value, this parameter is treated as required
-            test-value-command:
-                type: string
-        # And here we are defining the actual steps the command executes
-        steps:
-            # The "run" command executes a cli command. Since we're using a Windows Orb, we can use the Windows cli commands.
-            # Here we're also using some parameters. Note the use of "pipeline" in one of them
-            - run: echo "Pipeline parameter is << pipeline.parameters.test-value >>"
-            - run: echo "Command parameter is << parameters.test-value-command >>"
-            # "TEST_VAR" is a variable that was defined in the project settings inside CircleCI web UI.
-            # Note that printing environment variables will show them as redacted in CircleCI
-            - run: echo $env:TEST_VAR
-
-
-# Jobs are a collection of "steps" that runs commands or scripts.
-jobs:
-    # Here we are creating a job called "build"
-    build:
-        description: "This is the first job"
-        # Each job requires an "executor", which is "who" is gonna execute the steps defined.
-        # In this case, we're using the windows orb defined above.
-        executor:
-            # Check the orb documentation to see which executors are available
-            name: win/default
-            # We have optional arguments as well. Here we are defining the resource class, which is basically how many resources is available
-            # to execute this command. Check the docs for all arguments.
-            size: "medium"
-        # We can also have parameters inside a job
-        parameters:
-            test-value-job:
-                type: string
-        # Finally, we need to defined the actual steps the job will execute. Steps can be commands or scripts
-        steps:
-            # The "checkout" command is a built-in command from CircleCI, which will just pull all changes from the repository
-            - checkout
-            - run: echo "Hello World!"
-            # And, of course, we can call our own previously defined commands
-            - print-test-values:
-                # Since we defined a parameter in our command, we need to pass it as an argument
-                test-value-command: << parameters.test-value-job >>
-            - run:
-                # We can also give custom name to things like steps, commands, and jobs
-                name: "Print environment variables"
-                # We can use environment variables as well, although these only exists at the job level
-                command: Write-Host "This job was executed by $env:CIRCLE_USERNAME, from repo $env:CIRCLE_PROJECT_REPONAME, branch $env:CIRCLE_BRANCH."
-    post-build:
-        description: "This is the second job"
-        executor:
-            name: win/default
-        steps:
-            - run: echo "Build has finished"
-
-
-# Workflows defines a list of jobs and their execution order.
 workflows:
-    # Here we're creating a workflow called "hello-world"
-    hello-world:
-        # Inside the workflow, we then define which jobs it'll execute. In this case we're using the "build" job we defined before,
-        # but we can defined the job body here if we want.
+    build:
         jobs:
-            - build:
-                test-value-job: "test string"
-                # We can define filters to tell when a job should be executed.
-                # In this case, we're saying this job will be executed only when the main branch changes
-                filters:
-                    branches:
-                        only:
-                            - main
-            # Jobs are executed in parallel by default, so if we can tell a job that it needs to wait for another job before executing
-            - post-build:
-                requires:
-                    - build
+            - checkout
+            - unity/build:
+                executor:
+                    name: "unity/windows-2022"
+                    target_platform: "windows-il2cpp"
+                    editor_version: "2021.3.13f1"
+                name: "Build-windowsx64-il2cpp"
+                build-name: ""
+                project-path: .
+                build-target: StandaloneWindows64
+                compress: true
+                custom-parameters: ""
+                store-artifacts: true
