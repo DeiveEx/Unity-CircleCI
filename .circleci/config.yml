@@ -6,8 +6,16 @@ orbs:
 workflows:
     build:
         jobs:
-            - checkout
+            - setup:
+                steps:
+                    - checkout
             - unity/build:
+                requires:
+                  - setup
+                filters:
+                  branches:
+                    only:
+                        - main
                 executor:
                     name: "unity/windows-2022"
                     target_platform: "windows-il2cpp"
