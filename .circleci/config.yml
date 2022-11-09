@@ -57,7 +57,7 @@ workflows:
                 project-path: .
                 build-target: WebGL
                 compress: true
-                custom-parameters: ""
+                custom-parameters: "-BuildOptions Development"
                 store-artifacts: true
                 context: unity-personal
     
