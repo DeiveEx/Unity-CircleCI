@@ -3,18 +3,29 @@ version: 2.1
 orbs:
     unity: game-ci/unity@1.3.0
 
+parameters:
+    editor-version:
+        description: "The unity version to use"
+        type: string
+        default: "2021.3.13f1"
+
 workflows:
+    create-unity-activation-file:
+        jobs:
+            - unity/create-activation-file:
+                editor_version: << pipeline.parameters.editor-version >>
     build:
         jobs:
+            # Windows Build
             - unity/build:
                 filters:
                   branches:
-                    only:
+                    ignore:
                         - main
                 executor:
                     name: "unity/windows-2019"
                     target_platform: "windows-il2cpp"
-                    editor_version: "2021.3.13f1"
+                    editor_version: << pipeline.parameters.editor-version >>
                 name: "Build-windowsx64-il2cpp"
                 build-name: ""
                 project-path: .
@@ -22,3 +33,4 @@ workflows:
                 compress: true
                 custom-parameters: ""
                 store-artifacts: true
+    
