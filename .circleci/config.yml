@@ -40,6 +40,8 @@ commands:
             # Here we're also using some parameters. Not the use of "pipeline" in one of them
             - run: echo "Pipeline parameter is << pipeline.parameters.test-value >>"
             - run: echo "Command parameter is << parameters.test-value-command >>"
+            # "TEST_VAR" is a variable that was defined in the project settings inside CircleCI web UI
+            - run: echo $env:TEST_VAR
 
 
 # Jobs are a collection of "steps" that runs commands or scripts.
@@ -67,12 +69,11 @@ jobs:
             # And, of course, we can call our own previously defined commands
             - print-test-values:
                 test-value-command: << parameters.test-value-job >>
-            - run: echo ${TEST_VAR}
             - run:
                 # We can also give custom name to things like steps, commands, and jobs
                 name: "Print environment variables"
                 # We can use environment variables as well, although these only exists at the job level
-                command: Write-Host "This job was executed by $env:CIRCLE_USERNAME, from repo $CIRCLE_PROJECT_REPONAME, branch $CIRCLE_BRANCH. Also $env:TEST_VAR"
+                command: Write-Host "This job was executed by $env:CIRCLE_USERNAME, from repo $env:CIRCLE_PROJECT_REPONAME, branch $env:CIRCLE_BRANCH."
     post-build:
         description: "This is the second job"
         executor:
@@ -89,7 +90,7 @@ workflows:
         # but we can defined the job body here if we want.
         jobs:
             - build:
-                test-value-job: ${TEST_VAR}
+                test-value-job: "test string"
                 # We can define filters to tell when a job should be executed.
                 # In this case, we're saying this job will be executed only when the main branch changes
                 filters:
