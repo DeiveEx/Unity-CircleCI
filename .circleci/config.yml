@@ -14,22 +14,48 @@ parameters:
         default: "Build"
 
 workflows:
+    ## Uncomment this job if you need to activate a PERSONAL license for Unity. We probably can create some kind of script to check if
+    ## Unity is already activated and just execute this job if it isn't.
+    ## For more information about activation, check: https://game.ci/docs/circleci/activation
+    # create-unity-activation-file:
+    #     jobs:
+    #         - unity/create-activation-file:
+    #             editor_version: << pipeline.parameters.editor-version >>
     build:
         jobs:
             # Windows Build
+            # - unity/build:
+            #     filters:
+            #       branches:
+            #         only:
+            #             - main
+            #     executor:
+            #         name: "unity/windows-2019"
+            #         target_platform: "windows-il2cpp"
+            #         editor_version: << pipeline.parameters.editor-version >>
+            #     name: "<< pipeline.parameters.build-name >>-windowsx64-il2cpp"
+            #     build-name: ""
+            #     project-path: .
+            #     build-target: StandaloneWindows64
+            #     compress: true
+            #     custom-parameters: ""
+            #     store-artifacts: true
+            #     context: unity-personal
+            
+            # WebGL Build
             - unity/build:
                 filters:
                   branches:
                     only:
                         - main
                 executor:
-                    name: "unity/windows-2019"
-                    target_platform: "windows-il2cpp"
+                    name: "unity/ubuntu"
+                    target_platform: "webgl"
                     editor_version: << pipeline.parameters.editor-version >>
-                name: "<< pipeline.parameters.build-name >>-windowsx64-il2cpp"
+                name: "<< pipeline.parameters.build-name >>-webgl"
                 build-name: ""
                 project-path: .
-                build-target: StandaloneWindows64
+                build-target: WebGL
                 compress: true
                 custom-parameters: ""
                 store-artifacts: true
