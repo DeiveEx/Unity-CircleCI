@@ -12,7 +12,7 @@ workflows:
                     only:
                         - main
                 executor:
-                    name: "unity/windows-2022"
+                    name: "unity/windows-2019"
                     target_platform: "windows-il2cpp"
                     editor_version: "2021.3.13f1"
                 name: "Build-windowsx64-il2cpp"
