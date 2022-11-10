@@ -93,10 +93,9 @@ workflows:
             #     store-artifacts: true
             #     context: unity-personal
 
-
             - aws-cli/setup
-            - aws-test:
-                context: aws
+            # - aws-test:
+            #     context: aws
 
             # # Copy build to S3 bucket
             # - aws-s3/sync:
