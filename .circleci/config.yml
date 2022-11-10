@@ -21,6 +21,7 @@ jobs:
         steps:
             - checkout
             - aws-cli/setup
+            - run: aws help
             - run: aws s3api list-buckets
 
 workflows:
