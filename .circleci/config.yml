@@ -93,7 +93,8 @@ workflows:
             #     store-artifacts: true
             #     context: unity-personal
 
-            - aws-cli/setup
+            - aws-cli/setup:
+                aws-access-key-id: AWS_ACCESS_KEY_ID
             # - aws-test:
             #     context: aws
 
