@@ -72,6 +72,7 @@ workflows:
                     target_platform: "android"
                     editor_version: << pipeline.parameters.editor-version >>
                 name: "<< pipeline.parameters.build-name >>-android"
+                job_name: "Build Android"
                 build-name: ""
                 project-path: .
                 build-target: Android
