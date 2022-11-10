@@ -21,8 +21,7 @@ jobs:
         steps:
             - checkout
             - aws-cli/setup
-            - run: aws help
-            - run: aws s3api list-buckets
+            - run: aws s3 ls
 
 workflows:
     # # Uncomment this job if you need to activate a PERSONAL license for Unity. We probably can create some kind of script to check if
