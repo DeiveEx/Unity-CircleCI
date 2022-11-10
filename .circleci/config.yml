@@ -20,10 +20,7 @@ jobs:
         executor: aws-cli/default
         steps:
             - checkout
-            - run: |
-                aws configure set region "sa-east-1"
-                aws configure set aws_access_key_id "$AWS_ACCESS_KEY_ID"
-                aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KEY"
+            - aws-cli/setup
             - run: aws s3api list-buckets
 
 workflows:
@@ -93,10 +90,8 @@ workflows:
             #     store-artifacts: true
             #     context: unity-personal
 
-            - aws-cli/setup:
-                aws-access-key-id: AWS_ACCESS_KEY_ID
-            # - aws-test:
-            #     context: aws
+            - aws-test:
+                context: aws
 
             # # Copy build to S3 bucket
             # - aws-s3/sync:
