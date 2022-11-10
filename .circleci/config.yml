@@ -2,6 +2,8 @@ version: 2.1
 
 orbs:
     unity: game-ci/unity@1.3.0
+    aws-s3: circleci/aws-s3@3.0.0
+    aws-cli: circleci/aws-cli@3.1.3
 
 parameters:
     editor-version:
@@ -12,6 +14,17 @@ parameters:
         description: "The name of the build"
         type: string
         default: "Build"
+
+jobs:
+    aws-test:
+        executor: aws-cli/default
+        steps:
+            - checkout
+            - run: |
+                aws configure set region "sa-east-1"
+                aws configure set aws_access_key_id "$AWS_ACCESS_KEY_ID"
+                aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KEY"
+            - run: aws s3api list-buckets
 
 workflows:
     # # Uncomment this job if you need to activate a PERSONAL license for Unity. We probably can create some kind of script to check if
@@ -61,23 +74,33 @@ workflows:
             #     store-artifacts: true
             #     context: unity-personal
             
-            # Android Build
-            - unity/build:
-                filters:
-                  branches:
-                    only:
-                        - main
-                executor:
-                    name: "unity/ubuntu"
-                    target_platform: "android"
-                    editor_version: << pipeline.parameters.editor-version >>
-                name: "<< pipeline.parameters.build-name >>-android"
-                job_name: "Build Android"
-                build-name: ""
-                project-path: .
-                build-target: Android
-                compress: true
-                custom-parameters: "-BuildOptions Development"
-                store-artifacts: true
-                context: unity-personal
+            # # Android Build
+            # - unity/build:
+            #     filters:
+            #       branches:
+            #         only:
+            #             - main
+            #     executor:
+            #         name: "unity/ubuntu"
+            #         target_platform: "android"
+            #         editor_version: << pipeline.parameters.editor-version >>
+            #     name: "<< pipeline.parameters.build-name >>-android"
+            #     build-name: ""
+            #     project-path: .
+            #     build-target: Android
+            #     compress: true
+            #     custom-parameters: "-BuildOptions Development"
+            #     store-artifacts: true
+            #     context: unity-personal
+
+
+            - aws-test:
+                context: aws
+
+            # # Copy build to S3 bucket
+            # - aws-s3/sync:
+            #     from: ""
+            #     to: ""
+            #     arguments: ""
+            #     context: aws
     
