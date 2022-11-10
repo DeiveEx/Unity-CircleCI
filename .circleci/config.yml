@@ -94,7 +94,7 @@ workflows:
             #     context: unity-personal
 
 
-            - aws/setup
+            - aws-cli/setup
             - aws-test:
                 context: aws
 
