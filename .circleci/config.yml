@@ -21,6 +21,7 @@ jobs:
         steps:
             - checkout
             - aws-cli/setup
+            - run: echo $AWS_ACCESS_KEY
             - run: aws s3 ls
 
 workflows:
