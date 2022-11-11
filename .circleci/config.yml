@@ -10,15 +10,30 @@ parameters:
         type: string
         default: "2021.3.13f1"
     build-name:
-        description: "The name of the build"
+        description: "The name of the build. If empty, the build will be named after the target platform. "
         type: string
-        default: "Build"
+        default: ""
+    target-platform:
+        description: "Which platform to build to"
+        type: enum
+        default: android
+    build-target:
+        description: "Which platform to build to"
+        type: string
+        default: "Android"
+    executor-name:
+        description: "Which executor to use"
+        type: string
+        default: "unity/ubuntu"
+    project-path:
+        description: "Relative path for the project"
+        type: string
+        default: "."
 
 jobs:
     upload-to-aws-bucket:
         executor: aws-cli/default
         steps:
-            - checkout
             - aws-cli/setup
             - aws-cli/role-arn-setup:
                 profile-name: circleci
@@ -37,65 +52,40 @@ workflows:
     #             editor_version: << pipeline.parameters.editor-version >>
     build:
         jobs:
-            # # Windows Build
-            # - unity/build:
-            #     filters:
-            #       branches:
-            #         only:
-            #             - main
-            #     executor:
-            #         name: "unity/windows-2019"
-            #         target_platform: "windows-il2cpp"
-            #         editor_version: << pipeline.parameters.editor-version >>
-            #     name: "<< pipeline.parameters.build-name >>-windowsx64-il2cpp"
-            #     build-name: ""
-            #     project-path: .
-            #     build-target: StandaloneWindows64
-            #     compress: true
-            #     custom-parameters: ""
-            #     store-artifacts: true
-            #     context: unity-personal
-            
-            # # WebGL Build
-            # - unity/build:
-            #     filters:
-            #       branches:
-            #         only:
-            #             - main
-            #     executor:
-            #         name: "unity/ubuntu"
-            #         target_platform: "webgl"
-            #         editor_version: << pipeline.parameters.editor-version >>
-            #     name: "<< pipeline.parameters.build-name >>-webgl"
-            #     build-name: ""
-            #     project-path: .
-            #     build-target: WebGL
-            #     compress: true
-            #     custom-parameters: "-BuildOptions Development"
-            #     store-artifacts: true
-            #     context: unity-personal
-            
-            # # Android Build
-            # - unity/build:
-            #     filters:
-            #       branches:
-            #         only:
-            #             - main
-            #     executor:
-            #         name: "unity/ubuntu"
-            #         target_platform: "android"
-            #         editor_version: << pipeline.parameters.editor-version >>
-            #     name: "<< pipeline.parameters.build-name >>-android"
-            #     build-name: ""
-            #     project-path: .
-            #     build-target: Android
-            #     compress: true
-            #     custom-parameters: "-BuildOptions Development"
-            #     store-artifacts: true
-            #     context: unity-personal
+            # Run Tests
+            - unity/test:
+                project-path: << pipeline.parameters.project-path >>
+                test-platform: "editmode"
+
+            - unity/test:
+                project-path: << pipeline.parameters.project-path >>
+                test-platform: "playmode"
+
+            # Build Player
+            - unity/build:
+                requires:
+                  - unity/test
+                filters:
+                  branches:
+                    only:
+                        - main
+                executor:
+                    name: << pipeline.parameters.executor-name >>
+                    target_platform: << pipeline.parameters.target-platform >>
+                    editor_version: << pipeline.parameters.editor-version >>
+                name: "<< pipeline.parameters.build-name >>-android"
+                build-name: << pipeline.parameters.build-name >>
+                project-path: << pipeline.parameters.project-path >>
+                build-target: << pipeline.parameters.build-target >>
+                compress: true
+                custom-parameters: "-BuildOptions Development"
+                store-artifacts: false
+                context: unity-personal
 
             # Copy build to S3 bucket
             - upload-to-aws-bucket:
+                requires:
+                  - unity/build
                 context: aws
 
     
