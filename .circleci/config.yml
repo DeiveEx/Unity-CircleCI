@@ -53,7 +53,8 @@ jobs:
             - run: pwd
             - run: ls -a -l
             - run: ls -a -l .
-            - run: ls -a -l -d << parameters.project-path >>
+            - run: ls -a -l << parameters.project-path >>
+            - run: ls -a -l << parameters.project-path >>/test
             - aws-cli/setup
             - aws-cli/role-arn-setup:
                 profile-name: circleci
@@ -64,6 +65,7 @@ jobs:
             - run: aws s3 ls $BUCKET/test --profile circleci
             - run: aws s3 sync << parameters.project-path >>/test $BUCKET/test/<< parameters.build-target >> --profile circleci --delete
             - run: aws s3 ls $BUCKET --profile circleci
+            - run: aws s3 ls $BUCKET/test --profile circleci
 
 workflows:
     # # Uncomment this job if you need to activate a PERSONAL license for Unity. We probably can create some kind of script to check if
