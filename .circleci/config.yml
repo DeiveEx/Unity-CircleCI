@@ -55,7 +55,9 @@ jobs:
                 profile-name: circleci
                 role-arn: "arn:aws:iam::992660079108:role/circleci_role"
                 source-profile: default
+            - run: pwd
             - run: ls -a
+            - run: ls -l chap1 .profile
             - run: aws s3 ls --profile circleci
             - run: aws s3 ls $BUCKET --profile circleci
             - run: aws s3 sync << parameters.project-path >>/README.md $BUCKET/<< parameters.build-name >>/<< parameters.build-target >> --profile circleci
