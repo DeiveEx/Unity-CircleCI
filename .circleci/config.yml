@@ -62,10 +62,18 @@ workflows:
         jobs:
             # Run Tests
             - unity/test:
+                executor:
+                    name: << pipeline.parameters.executor-name >>
+                    target_platform: << pipeline.parameters.target-platform >>
+                    editor_version: << pipeline.parameters.editor-version >>
                 project-path: << pipeline.parameters.project-path >>
                 test-platform: "editmode"
 
             - unity/test:
+                executor:
+                    name: << pipeline.parameters.executor-name >>
+                    target_platform: << pipeline.parameters.target-platform >>
+                    editor_version: << pipeline.parameters.editor-version >>
                 project-path: << pipeline.parameters.project-path >>
                 test-platform: "playmode"
 
