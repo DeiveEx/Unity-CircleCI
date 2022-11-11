@@ -39,6 +39,26 @@ parameters:
         default: "."
 
 jobs:
+    build-project:
+        executor:
+            name: <<pipeline.parameters.executor-name>>
+            target_platform: <<pipeline.parameters.target-platform>>
+            editor_version: <<pipeline.parameters.editor-version>>
+        steps:
+            - checkout
+            - prepare-env:
+                project-path: <<pipeline.parameters.project-path>>
+            - build:
+                build-name: <<pipeline.parameters.build-name>>
+                build-target: <<pipeline.parameters.build-target>>
+                custom-parameters: "-BuildOptions Development"
+                project-path: <<pipeline.parameters.project-path>>
+                store-artifacts: false
+            - persist_to_workspace:
+                root: <<pipeline.parameters.project-path>>
+                paths:
+                  - "Builds/<<pipeline.parameters.build-target>>"
+
     upload-to-aws-bucket:
         executor: aws-cli/default
         parameters:
@@ -49,7 +69,9 @@ jobs:
             build-name:
                 type: string
         steps:
-            - run: ls -a -l << parameters.project-path >>
+            - run: ls -a -l <<parameters.project-path>>
+            - attach_workspace:
+                at: "Builds/<<pipeline.parameters.build-target>>"
             - aws-cli/setup
             - aws-cli/role-arn-setup:
                 profile-name: circleci
@@ -57,7 +79,7 @@ jobs:
                 source-profile: default
             - run: aws s3 ls --profile circleci
             - run: aws s3 ls $BUCKET --profile circleci --recursive
-            - run: aws s3 cp << parameters.project-path >>/Build $BUCKET/Builds/<< parameters.build-target >> --profile circleci --recursive
+            - run: aws s3 cp <<parameters.project-path>>/Builds/<<parameters.build-target>> $BUCKET/Builds/<<parameters.build-target>> --profile circleci --recursive
             - run: aws s3 ls $BUCKET --profile circleci --recursive
 
 workflows:
@@ -67,32 +89,32 @@ workflows:
     # create-unity-activation-file:
     #     jobs:
     #         - unity/create-activation-file:
-    #             editor_version: << pipeline.parameters.editor-version >>
+    #             editor_version: <<pipeline.parameters.editor-version>>
     build:
         jobs:
             # # Run Tests
             # - unity/test:
             #     name: "editmode-tests"
             #     executor:
-            #         name: << pipeline.parameters.executor-name >>
-            #         target_platform: << pipeline.parameters.target-platform >>
-            #         editor_version: << pipeline.parameters.editor-version >>
-            #     project-path: << pipeline.parameters.project-path >>
+            #         name: <<pipeline.parameters.executor-name>>
+            #         target_platform: <<pipeline.parameters.target-platform>>
+            #         editor_version: <<pipeline.parameters.editor-version>>
+            #     project-path: <<pipeline.parameters.project-path>>
             #     test-platform: "editmode"
             #     context: unity-personal
 
             # - unity/test:
             #     name: "playmode-tests"
             #     executor:
-            #         name: << pipeline.parameters.executor-name >>
-            #         target_platform: << pipeline.parameters.target-platform >>
-            #         editor_version: << pipeline.parameters.editor-version >>
-            #     project-path: << pipeline.parameters.project-path >>
+            #         name: <<pipeline.parameters.executor-name>>
+            #         target_platform: <<pipeline.parameters.target-platform>>
+            #         editor_version: <<pipeline.parameters.editor-version>>
+            #     project-path: <<pipeline.parameters.project-path>>
             #     test-platform: "playmode"
             #     context: unity-personal
 
             # Build Player
-            - unity/build:
+            - build-project:
                 # requires:
                 #   - editmode-tests
                 #   - playmode-tests
@@ -100,25 +122,15 @@ workflows:
                   branches:
                     only:
                         - main
-                executor:
-                    name: << pipeline.parameters.executor-name >>
-                    target_platform: << pipeline.parameters.target-platform >>
-                    editor_version: << pipeline.parameters.editor-version >>
-                build-name: << pipeline.parameters.build-name >>
-                project-path: << pipeline.parameters.project-path >>
-                build-target: << pipeline.parameters.build-target >>
-                compress: true
-                custom-parameters: "-BuildOptions Development"
-                store-artifacts: false
                 context: unity-personal
 
             # Copy build to S3 bucket
             - upload-to-aws-bucket:
                 requires:
                   - unity/build
-                project-path: << pipeline.parameters.project-path >>
-                build-target: << pipeline.parameters.build-target >>
-                build-name: << pipeline.parameters.build-name >>
+                project-path: <<pipeline.parameters.project-path>>
+                build-target: <<pipeline.parameters.build-target>>
+                build-name: <<pipeline.parameters.build-name>>
                 context: aws
 
     
