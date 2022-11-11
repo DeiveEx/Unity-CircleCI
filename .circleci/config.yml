@@ -46,9 +46,9 @@ jobs:
             editor_version: <<pipeline.parameters.editor-version>>
         steps:
             - checkout
-            - prepare-env:
+            - unity/prepare-env:
                 project-path: <<pipeline.parameters.project-path>>
-            - build:
+            - unity/build:
                 build-name: <<pipeline.parameters.build-name>>
                 build-target: <<pipeline.parameters.build-target>>
                 custom-parameters: "-BuildOptions Development"
