@@ -56,7 +56,7 @@ jobs:
                 source-profile: default
             - run: aws s3 ls --profile circleci
             - run: aws s3 ls $BUCKET --profile circleci
-            - run: aws s3 sync << parameters.project-path >>/Builds/<< parameters.build-target >> $BUCKET/<< parameters.build-name >>/<< parameters.build-target >> --profile circleci
+            - run: aws s3 sync << parameters.project-path >>/README.md $BUCKET/<< parameters.build-name >>/<< parameters.build-target >> --profile circleci
             - run: aws s3 ls $BUCKET --profile circleci
 
 workflows:
@@ -90,31 +90,31 @@ workflows:
             #     test-platform: "playmode"
             #     context: unity-personal
 
-            # Build Player
-            - unity/build:
-                # requires:
-                #   - editmode-tests
-                #   - playmode-tests
-                filters:
-                  branches:
-                    only:
-                        - main
-                executor:
-                    name: << pipeline.parameters.executor-name >>
-                    target_platform: << pipeline.parameters.target-platform >>
-                    editor_version: << pipeline.parameters.editor-version >>
-                build-name: << pipeline.parameters.build-name >>
-                project-path: << pipeline.parameters.project-path >>
-                build-target: << pipeline.parameters.build-target >>
-                compress: true
-                custom-parameters: "-BuildOptions Development"
-                store-artifacts: false
-                context: unity-personal
+            # # Build Player
+            # - unity/build:
+            #     # requires:
+            #     #   - editmode-tests
+            #     #   - playmode-tests
+            #     filters:
+            #       branches:
+            #         only:
+            #             - main
+            #     executor:
+            #         name: << pipeline.parameters.executor-name >>
+            #         target_platform: << pipeline.parameters.target-platform >>
+            #         editor_version: << pipeline.parameters.editor-version >>
+            #     build-name: << pipeline.parameters.build-name >>
+            #     project-path: << pipeline.parameters.project-path >>
+            #     build-target: << pipeline.parameters.build-target >>
+            #     compress: true
+            #     custom-parameters: "-BuildOptions Development"
+            #     store-artifacts: false
+            #     context: unity-personal
 
             # Copy build to S3 bucket
             - upload-to-aws-bucket:
-                requires:
-                  - unity/build
+                # requires:
+                #   - unity/build
                 project-path: << pipeline.parameters.project-path >>
                 build-target: << pipeline.parameters.build-target >>
                 build-name: << pipeline.parameters.build-name >>
