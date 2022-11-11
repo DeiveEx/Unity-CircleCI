@@ -61,11 +61,9 @@ jobs:
                 role-arn: "arn:aws:iam::992660079108:role/circleci_role"
                 source-profile: default
             - run: aws s3 ls --profile circleci
-            - run: aws s3 ls $BUCKET --profile circleci
-            - run: aws s3 ls $BUCKET/test --profile circleci
+            - run: aws s3 ls $BUCKET --profile circleci --recursive
             - run: aws s3 cp << parameters.project-path >>/test $BUCKET/test/<< parameters.build-target >> --profile circleci --recursive
-            - run: aws s3 ls $BUCKET --profile circleci
-            - run: aws s3 ls $BUCKET/test --profile circleci
+            - run: aws s3 ls $BUCKET --profile circleci --recursive
 
 workflows:
     # # Uncomment this job if you need to activate a PERSONAL license for Unity. We probably can create some kind of script to check if
