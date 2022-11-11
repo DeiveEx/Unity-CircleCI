@@ -62,7 +62,8 @@ jobs:
                 source-profile: default
             - run: aws s3 ls --profile circleci
             - run: aws s3 ls $BUCKET --profile circleci --recursive
-            - run: aws s3 cp << parameters.project-path >>/test $BUCKET/test/<< parameters.build-target >> --profile circleci --recursive
+            # - run: aws s3 cp << parameters.project-path >>/test $BUCKET/test/<< parameters.build-target >> --profile circleci --recursive
+            - run: aws s3 rm $BUCKET/test/<< parameters.build-target >> --profile circleci --recursive
             - run: aws s3 ls $BUCKET --profile circleci --recursive
 
 workflows:
