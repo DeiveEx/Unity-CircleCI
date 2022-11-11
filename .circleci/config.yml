@@ -51,11 +51,7 @@ jobs:
         steps:
             - checkout
             - run: pwd
-            - run: ls -a
-            - run: ls -l -d .
-            - run: ls -l << parameters.project-path >>/README.md
-            - run: printenv
-            - run: echo $BUCKET
+            - run: ls -a -l
             - aws-cli/setup
             - aws-cli/role-arn-setup:
                 profile-name: circleci
