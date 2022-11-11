@@ -41,6 +41,13 @@ parameters:
 jobs:
     upload-to-aws-bucket:
         executor: aws-cli/default
+        parameters:
+            project-path:
+                type: string
+            build-target:
+                type: string
+            build-name:
+                type: string
         steps:
             - aws-cli/setup
             - aws-cli/role-arn-setup:
@@ -48,6 +55,8 @@ jobs:
                 role-arn: "arn:aws:iam::992660079108:role/circleci_role"
                 source-profile: default
             - run: aws s3 ls --profile circleci
+            - run: aws s3 ls $BUCKET --profile circleci
+            - run: aws s3 sync << parameters.project-path >>/Builds/<< parameters.build-target >> $BUCKET/<< parameters.build-name >>/<< parameters.build-target >> --profile circleci
             - run: aws s3 ls $BUCKET --profile circleci
 
 workflows:
@@ -60,16 +69,16 @@ workflows:
     #             editor_version: << pipeline.parameters.editor-version >>
     build:
         jobs:
-            # Run Tests
-            - unity/test:
-                name: "editmode-tests"
-                executor:
-                    name: << pipeline.parameters.executor-name >>
-                    target_platform: << pipeline.parameters.target-platform >>
-                    editor_version: << pipeline.parameters.editor-version >>
-                project-path: << pipeline.parameters.project-path >>
-                test-platform: "editmode"
-                context: unity-personal
+            # # Run Tests
+            # - unity/test:
+            #     name: "editmode-tests"
+            #     executor:
+            #         name: << pipeline.parameters.executor-name >>
+            #         target_platform: << pipeline.parameters.target-platform >>
+            #         editor_version: << pipeline.parameters.editor-version >>
+            #     project-path: << pipeline.parameters.project-path >>
+            #     test-platform: "editmode"
+            #     context: unity-personal
 
             # - unity/test:
             #     name: "playmode-tests"
@@ -79,11 +88,12 @@ workflows:
             #         editor_version: << pipeline.parameters.editor-version >>
             #     project-path: << pipeline.parameters.project-path >>
             #     test-platform: "playmode"
+            #     context: unity-personal
 
             # Build Player
             - unity/build:
-                requires:
-                  - editmode-tests
+                # requires:
+                #   - editmode-tests
                 #   - playmode-tests
                 filters:
                   branches:
@@ -105,6 +115,9 @@ workflows:
             - upload-to-aws-bucket:
                 requires:
                   - unity/build
+                project-path: << pipeline.parameters.project-path >>
+                build-target: << pipeline.parameters.build-target >>
+                build-name: << pipeline.parameters.build-name >>
                 context: aws
 
     
