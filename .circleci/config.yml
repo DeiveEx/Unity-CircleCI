@@ -127,7 +127,7 @@ workflows:
             # Copy build to S3 bucket
             - upload-to-aws-bucket:
                 requires:
-                  - unity/build
+                  - build-project
                 project-path: <<pipeline.parameters.project-path>>
                 build-target: <<pipeline.parameters.build-target>>
                 build-name: <<pipeline.parameters.build-name>>
