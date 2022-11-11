@@ -62,6 +62,7 @@ workflows:
         jobs:
             # Run Tests
             - unity/test:
+                name: "Edit Mode Tests"
                 executor:
                     name: << pipeline.parameters.executor-name >>
                     target_platform: << pipeline.parameters.target-platform >>
@@ -70,6 +71,7 @@ workflows:
                 test-platform: "editmode"
 
             - unity/test:
+                name: "Play Mode Tests"
                 executor:
                     name: << pipeline.parameters.executor-name >>
                     target_platform: << pipeline.parameters.target-platform >>
@@ -80,7 +82,8 @@ workflows:
             # Build Player
             - unity/build:
                 requires:
-                  - unity/test
+                  - "Edit Mode Tests"
+                  - "Play Mode Tests"
                 filters:
                   branches:
                     only:
