@@ -49,6 +49,7 @@ jobs:
             build-name:
                 type: string
         steps:
+            - checkout
             - aws-cli/setup
             - aws-cli/role-arn-setup:
                 profile-name: circleci
