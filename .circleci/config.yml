@@ -92,7 +92,6 @@ workflows:
                     name: << pipeline.parameters.executor-name >>
                     target_platform: << pipeline.parameters.target-platform >>
                     editor_version: << pipeline.parameters.editor-version >>
-                name: "<< pipeline.parameters.build-name >>-android"
                 build-name: << pipeline.parameters.build-name >>
                 project-path: << pipeline.parameters.project-path >>
                 build-target: << pipeline.parameters.build-target >>
