@@ -63,7 +63,7 @@ jobs:
                 source-profile: default
             - run: aws s3 ls --profile circleci
             - run: aws s3 ls $BUCKET --profile circleci
-            - run: aws s3 cp << parameters.project-path >>/README.md $BUCKET/test/<< parameters.build-target >> --profile circleci
+            - run: aws s3 sync << parameters.project-path >>/README.md $BUCKET/test/<< parameters.build-target >> --profile circleci
             - run: aws s3 ls $BUCKET --profile circleci
 
 workflows:
