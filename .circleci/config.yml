@@ -24,6 +24,7 @@ jobs:
                 profile-name: circleci
                 role-arn: "arn:aws:iam::992660079108:role/circleci_role"
                 source-profile: default
+            - run: aws s3 ls --profile circleci
             - run: aws s3 ls $BUCKET --profile circleci
 
 workflows:
