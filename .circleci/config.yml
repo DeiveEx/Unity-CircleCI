@@ -60,15 +60,16 @@ workflows:
     #             editor_version: << pipeline.parameters.editor-version >>
     build:
         jobs:
-            # # Run Tests
-            # - unity/test:
-            #     name: "editmode-tests"
-            #     executor:
-            #         name: << pipeline.parameters.executor-name >>
-            #         target_platform: << pipeline.parameters.target-platform >>
-            #         editor_version: << pipeline.parameters.editor-version >>
-            #     project-path: << pipeline.parameters.project-path >>
-            #     test-platform: "editmode"
+            # Run Tests
+            - unity/test:
+                name: "editmode-tests"
+                executor:
+                    name: << pipeline.parameters.executor-name >>
+                    target_platform: << pipeline.parameters.target-platform >>
+                    editor_version: << pipeline.parameters.editor-version >>
+                project-path: << pipeline.parameters.project-path >>
+                test-platform: "editmode"
+                context: unity-personal
 
             # - unity/test:
             #     name: "playmode-tests"
@@ -81,8 +82,8 @@ workflows:
 
             # Build Player
             - unity/build:
-                # requires:
-                #   - editmode-tests
+                requires:
+                  - editmode-tests
                 #   - playmode-tests
                 filters:
                   branches:
