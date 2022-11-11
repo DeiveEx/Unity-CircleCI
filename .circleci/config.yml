@@ -15,6 +15,14 @@ parameters:
         default: ""
     target-platform:
         description: "Which platform to build to"
+        enum:
+            - android
+            - base
+            - ios
+            - linux-il2cpp
+            - mac-mono
+            - webgl
+            - windows-mono
         type: enum
         default: android
     build-target:
