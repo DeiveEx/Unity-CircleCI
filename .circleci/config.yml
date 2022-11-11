@@ -52,6 +52,7 @@ jobs:
             - checkout
             - run: pwd
             - run: ls -a -l
+            - run: ls -a -l .
             - run: ls -a -l -d << parameters.project-path >>
             - aws-cli/setup
             - aws-cli/role-arn-setup:
