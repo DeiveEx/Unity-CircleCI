@@ -39,6 +39,28 @@ parameters:
         type: string
         default: "."
 
+commands:
+    notify-slack-success:
+        parameters:
+            branch_pattern:
+                type: string
+                default: "main"
+        steps:
+            - slack/notify:
+                branch_pattern: <<parameters.branch_pattern>>
+                event: pass
+                template: "basic_success_1"
+    notify-slack-fail:
+        parameters:
+            branch_pattern:
+                type: string
+                default: "main"
+        steps:
+            - slack/notify:
+                branch_pattern: <<parameters.branch_pattern>>
+                event: fail
+                template: "basic_fail_1"
+
 jobs:
     build-project:
         executor:
@@ -59,6 +81,7 @@ jobs:
                 root: <<pipeline.parameters.project-path>>
                 paths:
                   - "Builds/<<pipeline.parameters.build-target>>"
+            - notify-slack-fail
 
     upload-to-aws-bucket:
         executor: aws-cli/default
@@ -88,19 +111,8 @@ jobs:
             - run:
                 name: "After upload"
                 command: aws s3 ls $BUCKET --profile circleci --recursive --human-readable --summarize
-
-    notify-slack:
-        docker:
-            - image: "cimg/base:stable"
-        steps:
-            - slack/notify:
-                branch_pattern: "main"
-                event: pass
-                template: "basic_success_1"
-            - slack/notify:
-                branch_pattern: "main"
-                event: fail
-                template: "basic_fail_1"
+            - notify-slack-fail
+            - notify-slack-success
 
 workflows:
     # # Uncomment this job if you need to activate a PERSONAL license for Unity. We probably can create some kind of script to check if
@@ -133,27 +145,23 @@ workflows:
             #     test-platform: "playmode"
             #     context: unity-personal
 
-            # # Build Player
-            # - build-project:
-            #     # requires:
-            #     #   - editmode-tests
-            #     #   - playmode-tests
-            #     filters:
-            #       branches:
-            #         only:
-            #             - main
-            #     context: unity-personal
+            # Build Player
+            - build-project:
+                # requires:
+                #   - editmode-tests
+                #   - playmode-tests
+                filters:
+                  branches:
+                    only:
+                        - main
+                context: unity-personal
 
-            # # Copy build to S3 bucket
-            # - upload-to-aws-bucket:
-            #     requires:
-            #       - build-project
-            #     project-path: <<pipeline.parameters.project-path>>
-            #     build-target: <<pipeline.parameters.build-target>>
-            #     build-name: <<pipeline.parameters.build-name>>
-            #     context: aws
-            
-            # Notify Slack
-            - notify-slack:
-                context: slack
+            # Copy build to S3 bucket
+            - upload-to-aws-bucket:
+                requires:
+                  - build-project
+                project-path: <<pipeline.parameters.project-path>>
+                build-target: <<pipeline.parameters.build-target>>
+                build-name: <<pipeline.parameters.build-name>>
+                context: aws
     
