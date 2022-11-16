@@ -155,7 +155,7 @@ workflows:
                     only:
                         - main
                 context: 
-                    # - unity-personal
+                    - unity-personal
                     - slack
 
             # Copy build to S3 bucket
