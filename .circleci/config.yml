@@ -142,16 +142,16 @@ workflows:
             #     test-platform: "playmode"
             #     context: unity-personal
 
-            # Build Player
-            - build-project:
-                # requires:
-                #   - editmode-tests
-                #   - playmode-tests
-                filters:
-                  branches:
-                    only:
-                        - main
-                context: unity-personal
+            # # Build Player
+            # - build-project:
+            #     # requires:
+            #     #   - editmode-tests
+            #     #   - playmode-tests
+            #     filters:
+            #       branches:
+            #         only:
+            #             - main
+            #     context: unity-personal
 
             # # Copy build to S3 bucket
             # - upload-to-aws-bucket:
@@ -163,9 +163,6 @@ workflows:
             #     context: aws
             
             # Notify Slack
-            - send-slack-notification:
-                jobs:
-                    - notify-slack:
-                        context: slack
-
+            - notify-slack:
+                context: slack
     
