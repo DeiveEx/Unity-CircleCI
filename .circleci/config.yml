@@ -33,7 +33,7 @@ parameters:
     executor-name:
         description: "Which executor to use. Options taken from: https://circleci.com/developer/orbs/orb/game-ci/unity#executors"
         type: string
-        default: "unity/windows-2019"
+        default: "unity/ubuntu"
     project-path:
         description: "Relative path for the project"
         type: string
