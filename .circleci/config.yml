@@ -84,7 +84,7 @@ jobs:
                 build-target: <<pipeline.parameters.build-target>>
                 custom-parameters: "-BuildOptions Development"
                 project-path: <<pipeline.parameters.project-path>>
-                store-artifacts: false
+                store-artifacts: true
             - persist_to_workspace:
                 root: <<pipeline.parameters.project-path>>
                 paths:
