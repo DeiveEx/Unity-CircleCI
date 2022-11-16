@@ -94,11 +94,11 @@ jobs:
             - image: "cimg/base:stable"
         steps:
             - slack/notify:
-                branch-pattern: "main"
+                branch_pattern: "main"
                 event: pass
                 template: "basic_success_1"
             - slack/notify:
-                branch-pattern: "main"
+                branch_pattern: "main"
                 event: fail
                 template: "basic_fail_1"
 
