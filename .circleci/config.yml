@@ -3,6 +3,7 @@ version: 2.1
 orbs:
     unity: game-ci/unity@1.3.0
     aws-cli: circleci/aws-cli@3.1.3
+    slack: circleci/slack@4.10.1
 
 parameters:
     editor-version:
@@ -76,11 +77,42 @@ jobs:
                 profile-name: circleci
                 role-arn: "arn:aws:iam::992660079108:role/circleci_role"
                 source-profile: default
-            - run: aws s3 ls $BUCKET --profile circleci --recursive --human-readable --summarize
+            - run:
+                name: "Before deletion"
+                command: aws s3 ls $BUCKET --profile circleci --recursive --human-readable --summarize
             - run: aws s3 rm $BUCKET/Builds/ --profile circleci --recursive
-            - run: aws s3 ls $BUCKET --profile circleci --recursive --human-readable --summarize
+            - run:
+                name: "Afrter deletion"
+                command: aws s3 ls $BUCKET --profile circleci --recursive --human-readable --summarize
             - run: aws s3 cp <<parameters.project-path>>/Builds/<<parameters.build-target>> $BUCKET/Builds/<<parameters.build-target>> --profile circleci --recursive
-            - run: aws s3 ls $BUCKET --profile circleci --recursive --human-readable --summarize
+            - run:
+                name: "After upload"
+                command: aws s3 ls $BUCKET --profile circleci --recursive --human-readable --summarize
+
+    notify-slack:
+        docker:
+            - image: "cimg/base:stable"
+            auth:
+                username: mydockerhub-user
+                password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
+        steps:
+            - slack/notify:
+                custom: |
+                    {
+                        "blocks": [
+                            {
+                                "type": "section",
+                                "fields": [
+                                    {
+                                    "type": "plain_text",
+                                    "text": "*This is a text notification*",
+                                    "emoji": true
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                event: always
 
 workflows:
     # # Uncomment this job if you need to activate a PERSONAL license for Unity. We probably can create some kind of script to check if
@@ -124,13 +156,19 @@ workflows:
                         - main
                 context: unity-personal
 
-            # Copy build to S3 bucket
-            - upload-to-aws-bucket:
-                requires:
-                  - build-project
-                project-path: <<pipeline.parameters.project-path>>
-                build-target: <<pipeline.parameters.build-target>>
-                build-name: <<pipeline.parameters.build-name>>
-                context: aws
+            # # Copy build to S3 bucket
+            # - upload-to-aws-bucket:
+            #     requires:
+            #       - build-project
+            #     project-path: <<pipeline.parameters.project-path>>
+            #     build-target: <<pipeline.parameters.build-target>>
+            #     build-name: <<pipeline.parameters.build-name>>
+            #     context: aws
+            
+            # Notify Slack
+            - send-slack-notification:
+                jobs:
+                    - notify-slack:
+                        context: slack
 
     
