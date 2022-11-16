@@ -45,21 +45,29 @@ commands:
             branch_pattern:
                 type: string
                 default: "main"
+            channel:
+                type: string
+                default: $SLACK_DEFAULT_CHANNEL
         steps:
             - slack/notify:
                 branch_pattern: <<parameters.branch_pattern>>
                 event: pass
                 template: "basic_success_1"
+                channel: <<parameters.channel>>
     notify-slack-fail:
         parameters:
             branch_pattern:
                 type: string
                 default: "main"
+            channel:
+                type: string
+                default: $SLACK_DEFAULT_CHANNEL
         steps:
             - slack/notify:
                 branch_pattern: <<parameters.branch_pattern>>
                 event: fail
                 template: "basic_fail_1"
+                channel: <<parameters.channel>>
 
 jobs:
     build-project:
@@ -81,7 +89,8 @@ jobs:
                 root: <<pipeline.parameters.project-path>>
                 paths:
                   - "Builds/<<pipeline.parameters.build-target>>"
-            - notify-slack-fail
+            - notify-slack-fail:
+                channel: D03LGH6V5UL
 
     upload-to-aws-bucket:
         executor: aws-cli/default
@@ -111,8 +120,10 @@ jobs:
             - run:
                 name: "After upload"
                 command: aws s3 ls $BUCKET --profile circleci --recursive --human-readable --summarize
-            - notify-slack-fail
-            - notify-slack-success
+            - notify-slack-fail:
+                channel: D03LGH6V5UL
+            - notify-slack-success:
+                channel: D03LGH6V5UL
 
 workflows:
     # # Uncomment this job if you need to activate a PERSONAL license for Unity. We probably can create some kind of script to check if
