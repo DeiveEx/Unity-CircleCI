@@ -94,23 +94,13 @@ jobs:
             - image: "cimg/base:stable"
         steps:
             - slack/notify:
-                channel: "C048D1RPJ30"
-                custom: |
-                    {
-                        "blocks": [
-                            {
-                                "type": "section",
-                                "fields": [
-                                    {
-                                    "type": "plain_text",
-                                    "text": "*This is a text notification*",
-                                    "emoji": true
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                event: always
+                branch-pattern: "main"
+                event: pass
+                template: "basic_success_1"
+            - slack/notify:
+                branch-pattern: "main"
+                event: fail
+                template: "basic_fail_1"
 
 workflows:
     # # Uncomment this job if you need to activate a PERSONAL license for Unity. We probably can create some kind of script to check if
