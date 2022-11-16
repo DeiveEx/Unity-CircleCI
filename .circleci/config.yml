@@ -154,7 +154,9 @@ workflows:
                   branches:
                     only:
                         - main
-                context: unity-personal
+                context: 
+                    - unity-personal
+                    - slack
 
             # Copy build to S3 bucket
             - upload-to-aws-bucket:
@@ -163,5 +165,7 @@ workflows:
                 project-path: <<pipeline.parameters.project-path>>
                 build-target: <<pipeline.parameters.build-target>>
                 build-name: <<pipeline.parameters.build-name>>
-                context: aws
+                context: 
+                    - aws
+                    - slack
     
