@@ -94,6 +94,7 @@ jobs:
             - image: "cimg/base:stable"
         steps:
             - slack/notify:
+                channel: "C048D1RPJ30"
                 custom: |
                     {
                         "blocks": [
