@@ -25,7 +25,7 @@ parameters:
             - webgl
             - windows-mono
         type: enum
-        default: base
+        default: windows-mono
     build-target:
         description: "Which platform to build to. Options taken from: https://docs.unity3d.com/2021.2/Documentation/ScriptReference/BuildTarget.html"
         type: string
