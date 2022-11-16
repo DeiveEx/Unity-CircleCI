@@ -105,7 +105,7 @@ jobs:
                 command: aws s3 ls $BUCKET --profile circleci --recursive --human-readable --summarize
             - run: aws s3 rm $BUCKET/Builds/ --profile circleci --recursive
             - run:
-                name: "Afrter deletion"
+                name: "After deletion"
                 command: aws s3 ls $BUCKET --profile circleci --recursive --human-readable --summarize
             - run: aws s3 cp <<parameters.project-path>>/Builds/<<parameters.build-target>> $BUCKET/Builds/<<parameters.build-target>> --profile circleci --recursive
             - run:
