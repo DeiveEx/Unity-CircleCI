@@ -15,7 +15,7 @@ parameters:
         type: string
         default: ""
     target-platform:
-        description: "Which platform to build to"
+        description: "Which platform to build to. Options taken from: https://game.ci/docs/docker/versions"
         enum:
             - android
             - base
@@ -25,15 +25,15 @@ parameters:
             - webgl
             - windows-mono
         type: enum
-        default: android
+        default: base
     build-target:
-        description: "Which platform to build to"
+        description: "Which platform to build to. Options taken from: https://docs.unity3d.com/2021.2/Documentation/ScriptReference/BuildTarget.html"
         type: string
-        default: "Android"
+        default: "StandaloneWindows64"
     executor-name:
-        description: "Which executor to use"
+        description: "Which executor to use. Options taken from: https://circleci.com/developer/orbs/orb/game-ci/unity#executors"
         type: string
-        default: "unity/ubuntu"
+        default: "unity/windows-2022"
     project-path:
         description: "Relative path for the project"
         type: string
@@ -89,7 +89,7 @@ jobs:
                 root: <<pipeline.parameters.project-path>>
                 paths:
                   - "Builds/<<pipeline.parameters.build-target>>"
-            - notify-slack-fail
+            # - notify-slack-fail
 
     upload-to-aws-bucket:
         executor: aws-cli/default
@@ -119,8 +119,8 @@ jobs:
             - run:
                 name: "After upload"
                 command: aws s3 ls $BUCKET --profile circleci --recursive --human-readable --summarize
-            - notify-slack-fail
-            - notify-slack-success
+            # - notify-slack-fail
+            # - notify-slack-success
 
 workflows:
     # # Uncomment this job if you need to activate a PERSONAL license for Unity. We probably can create some kind of script to check if
